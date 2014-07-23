@@ -1,0 +1,4 @@
+alias kf='killflamepremium; killflame; killflare;'
+alias killflame='export teeargs=`ps -eo args | grep tee | grep -v grep | grep /usr/discreet/log/flame | cut -d\  -f3` ; killall -v -s9 flame_LINUX_2.6_x86_64 ; killall -s9 "tee -a "$teeargs""'
+alias killflamepremium='export teeargs=`ps -eo args | grep tee | grep -v grep | grep /usr/discreet/log/flamepremium | cut -d\  -f3` ; killall -v -s9 flamepremium_LINUX_2.6_x86_64 ; killall -s9 "tee -a "$teeargs""'
+alias killflare='export teeargs=`ps -eo args | grep tee | grep -v grep | grep /usr/discreet/log/flare | cut -d\  -f3` ; killall -v -s9 flare_LINUX_2.6_x86_64 ; killall -s9 "tee -a "$teeargs""'
