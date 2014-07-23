@@ -5,3 +5,6 @@ ssh into each host provided by a named DNS list and run a command
 
 whoisawake:
 who is not responding to ping in a given subnet
+
+kill_flame:
+Kills all running autodesk flame products by typing kf in console
