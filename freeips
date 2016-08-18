@@ -1,0 +1,85 @@
+#!/usr/bin/env python2.6.4
+
+#wow this is ugly
+#check free IPs in dns by using dns zone xfers (host -l stmn..local)
+
+import subprocess
+import os
+import socket
+import argparse
+import sys
+
+def check_output(*popenargs, **kwargs):
+    """
+    subprocess.check_output doesn't existst in pythons before 2.7
+    this is a boilerplate to implement that function
+    if you use the .split method with newline it will include the last newline
+    which is why below when we iterate over a list made with it we omit the last entry [:-1]
+    """
+    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+    output, unused_err = process.communicate()
+    retcode = process.poll()
+    if retcode:
+        cmd = kwargs.get("args")
+        if cmd is None:
+            cmd = popenargs[0]
+        error = subprocess.CalledProcessError(retcode, cmd)
+        error.output = output
+        raise error
+    return output
+
+parser = argparse.ArgumentParser()
+
+
+parser.add_argument("-f", help="get free ips in the film desktop range", action="store_true")
+parser.add_argument("-ft", help="get free ips in the film teradici range", action="store_true")
+parser.add_argument("-at", help="get free ips in the advertising teradici range", action="store_true")
+parser.add_argument("-a", help="get free ips in the advertising range",action="store_true")
+
+if len(sys.argv) == 1:
+    print "Supply an argument"
+    parser.print_help()
+    sys.exit(1)
+
+filmRange = ("10.82.8.")
+filmTeraRange = ('"192.168.160.|192.168.161.|192.168.162.|192.168.163."')
+advRange = ('"10.82.4|10.82.5|10.82.6|10.82.7"')
+advTeraRange = ('"192.168.140.|192.168.141.|192.168.142.|192.168.143."')
+
+
+args = parser.parse_args()
+
+if args.f:
+    requestedRange = filmRange
+    prefix = "10.82."
+elif args.ft:
+    requestedRange = filmTeraRange
+    prefix = "192.168."
+elif args.a:
+    requestedRange = advRange
+    prefix = "10.82."
+elif args.at:
+    requestedRange = advTeraRange
+    prefix = "192.168."
+
+
+#CMD = "host -l stmn..local | awk '{print $4}' | egrep \"10.82.4|10.82.5|10.82.6|10.82.7\" | sort -n | cut  -d'.' -f3 | uniq"
+print requestedRange
+CMD = "host -l stmn..local | awk '{print $4}' | egrep " + requestedRange + " | sort -n | cut  -d'.' -f3 | uniq"
+subnets = check_output(CMD, shell=True).split('\n')[:-1]
+print subnets
+for subnet in subnets:
+    print "====FREE IPS IN SUBNET %s.%s ====" % (requestedRange.split('.')[:2],subnet)
+    #CMD = "host -l stmn..local | awk '{print $4}' | grep 10.82." + subnet + "  | sort -t . -k3,3n -k4,4n"
+    CMD = "host -l stmn..local | awk '{print $4}' | grep " + prefix + subnet + "  | sort -t . -k3,3n -k4,4n"
+    output = check_output(CMD, shell=True).split('\n')
+    if args.f:
+        usable = range(129,254)
+    else:
+        usable = range(1,254)
+    for x in output[:-1]:
+        z = int(x.split('.')[3])
+        if z in usable:
+            usable.remove(z)
+    for ip in usable:
+        print prefix + str(subnet) + "." + str(ip)

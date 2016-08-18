@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import os
+
+colorred = "\033[01;31m{0}\033[00m"
+colorg = "\033[1;36m{0}\033[00m"
+
+cwd = os.getcwd()
+acceptable = ('.jpg', '.exr', '.dpx', '.png', '.tiff')
+files = [f for f in os.listdir(cwd) if os.path.isfile(os.path.join(cwd, f)) and f.endswith(acceptable)]
+if len(files) < 1:
+    exit("no sequences in here")
+
+print colorg.format("\nSequences in directory: " + cwd, "\n")
+
+seqs = []
+for f in files:
+    print f.split('.')
+    seqname = f.split('.')[0]
+    if seqname not in seqs:
+        seqs.append(seqname)
+
+for seq in seqs:
+        ss = []
+        for f in files:
+            if seq in f:
+                ss.append(f)
+        ss = sorted(ss, key=lambda x: x.split('.')[-2])
+        print colorred.format(seq)
+        startFrame = min(ss).split('.')[-2]
+        endFrame = max(ss).split('.')[-2]
+        fileType = ss[1][-3:]
+        print "Start Frame: ", startFrame
+        print "End Frame: ", endFrame
+        print "Sequence Length: ", int(endFrame) - int(startFrame)
+        print "File Type: ", fileType
+        print "\n"
+

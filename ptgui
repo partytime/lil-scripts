@@ -1,0 +1,193 @@
+#!/bin/bash
+
+#
+############################################################################
+#wine + ptgui wrapper/deployment
+#deploys wineprefix to local machine
+#if prefix exists, run wine with ptgui and correct options.
+#the wine version I have for stmn does not do the wineprefix ownership check
+#I compiled a custom one and removed the ownership check
+#wine will make a per-user directory inside $winePrefixDst/drive_c/users
+#since ptgui does not touch the registry, we dont care if wine can write it
+#bryce-e@.com | 2015-06-11
+############################################################################
+#1234
+# Location
+case "$SITE" in
+    stmn)
+    wineBin="/software/wine/1.7.42/linux.centos6.i386/bin/wine"
+    winePrefixSrc="/software/engineering/ptgui/wine-install/wine.tgz"
+    winePrefixDst="/disk1/"
+    ptguiBin=$winePrefixDst".wine-ptgui/drive_c/Program Files/PTGui/PTGui.exe"
+    WINEARCH="win32"
+    WINEPREFIX="/disk1/.wine-ptgui"
+      ;;
+    *)
+      echo "Unconfigured for \"$SITE\". Exiting."
+    exit 1
+esac
+
+function copy_wineprefix
+{
+    tar -xzf $winePrefixSrc -C $winePrefixDst || exit 1
+}
+
+function copy_config
+{
+    mkdir -p $WINEPREFIX/drive_c/users/$USER/Application\ Data/PTGui 
+    cat > $WINEPREFIX/drive_c/users/$USER/Application\ Data/PTGui/Configuration.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+  <Option Name="AlignToGridSettings" Type="String" Value="0 0 1 1 1 1 0 0 2 0 1 1 5 20 0 1 1 5 20 1 0 0" />
+  <Option Name="AutoCheckForUpdates" Type="Bool" Value="1" />
+  <Option Name="ConfigVersion" Type="Int" Value="100012" />
+  <Option Name="LatestVersionUsed" Type="Int" Value="100012" />
+  <Option Name="MaxRamUsage" Type="Int" Value="2367" />
+  <Option Name="PreviousAutoCheckForUpdates" Type="Int" Value="16640" />
+  <Option Name="TempDir" Type="String" Value="Z:\tmp" />
+  <Option Name="TempDirPreferred" Type="Bool" Value="1" />
+  <Option Name="WarnSendBatchStitcherCloseProject" Type="Bool" Value="1" />
+  <Group Name="FormPos">
+    <Group Name="ControlPoints">
+      <Option Name="Height" Type="Int" Value="300" />
+      <Option Name="Left" Type="Int" Value="760" />
+      <Option Name="Top" Type="Int" Value="437" />
+      <Option Name="Width" Type="Int" Value="400" />
+    </Group>
+    <Group Name="DetailViewer">
+      <Option Name="Height" Type="Int" Value="300" />
+      <Option Name="Left" Type="Int" Value="760" />
+      <Option Name="Top" Type="Int" Value="437" />
+      <Option Name="Width" Type="Int" Value="400" />
+    </Group>
+    <Group Name="GridSetup">
+      <Option Name="Height" Type="Int" Value="522" />
+      <Option Name="Left" Type="Int" Value="617" />
+      <Option Name="Top" Type="Int" Value="326" />
+      <Option Name="Width" Type="Int" Value="686" />
+    </Group>
+    <Group Name="MainWindow">
+      <Option Name="Height" Type="Int" Value="549" />
+      <Option Name="Left" Type="Int" Value="560" />
+      <Option Name="Top" Type="Int" Value="313" />
+      <Option Name="Width" Type="Int" Value="800" />
+    </Group>
+    <Group Name="NumericalTransform">
+      <Option Name="Height" Type="Int" Value="154" />
+      <Option Name="Left" Type="Int" Value="860" />
+      <Option Name="Top" Type="Int" Value="574" />
+      <Option Name="Width" Type="Int" Value="264" />
+    </Group>
+    <Group Name="Options">
+      <Option Name="Height" Type="Int" Value="600" />
+      <Option Name="Left" Type="Int" Value="660" />
+      <Option Name="Top" Type="Int" Value="288" />
+      <Option Name="Width" Type="Int" Value="600" />
+    </Group>
+    <Group Name="PanoramaEditor">
+      <Option Name="Height" Type="Int" Value="400" />
+      <Option Name="Top" Type="Int" Value="1" />
+      <Option Name="Width" Type="Int" Value="500" />
+    </Group>
+  </Group>
+  <Group Name="GridLayouts">
+    <Group Name="ImageParams">
+      <Option Name="ColWidth0" Type="Int" Value="120" />
+      <Option Name="ColWidth1" Type="Int" Value="120" />
+      <Option Name="ColWidth10" Type="Int" Value="50" />
+      <Option Name="ColWidth11" Type="Int" Value="50" />
+      <Option Name="ColWidth12" Type="Int" Value="50" />
+      <Option Name="ColWidth13" Type="Int" Value="50" />
+      <Option Name="ColWidth14" Type="Int" Value="50" />
+      <Option Name="ColWidth15" Type="Int" Value="50" />
+      <Option Name="ColWidth16" Type="Int" Value="50" />
+      <Option Name="ColWidth17" Type="Int" Value="50" />
+      <Option Name="ColWidth18" Type="Int" Value="50" />
+      <Option Name="ColWidth19" Type="Int" Value="50" />
+      <Option Name="ColWidth2" Type="Int" Value="40" />
+      <Option Name="ColWidth20" Type="Int" Value="50" />
+      <Option Name="ColWidth21" Type="Int" Value="50" />
+      <Option Name="ColWidth22" Type="Int" Value="50" />
+      <Option Name="ColWidth23" Type="Int" Value="50" />
+      <Option Name="ColWidth24" Type="Int" Value="80" />
+      <Option Name="ColWidth25" Type="Int" Value="50" />
+      <Option Name="ColWidth26" Type="Int" Value="50" />
+      <Option Name="ColWidth27" Type="Int" Value="50" />
+      <Option Name="ColWidth28" Type="Int" Value="50" />
+      <Option Name="ColWidth29" Type="Int" Value="50" />
+      <Option Name="ColWidth3" Type="Int" Value="50" />
+      <Option Name="ColWidth4" Type="Int" Value="50" />
+      <Option Name="ColWidth5" Type="Int" Value="50" />
+      <Option Name="ColWidth6" Type="Int" Value="100" />
+      <Option Name="ColWidth7" Type="Int" Value="50" />
+      <Option Name="ColWidth8" Type="Int" Value="50" />
+      <Option Name="ColWidth9" Type="Int" Value="50" />
+      <Option Name="RowHeight" Type="Int" Value="100" />
+    </Group>
+    <Group Name="SourceImages">
+      <Option Name="ColWidth0" Type="Int" Value="120" />
+      <Option Name="ColWidth1" Type="Int" Value="400" />
+      <Option Name="ColWidth2" Type="Int" Value="60" />
+      <Option Name="ColWidth3" Type="Int" Value="60" />
+      <Option Name="RowHeight" Type="Int" Value="100" />
+    </Group>
+  </Group>
+  <Group Name="LicenseAccepted">
+    <Option Name="10.0.12.Pro" Type="Bool" Value="1" />
+  </Group>
+</Config>
+
+EOF
+}
+
+function set_wine_environment
+{
+    export WINEPREFIX='/disk1/.wine-ptgui'
+    export WINEDLLOVERRIDES='mscoree=d'
+    PATHTOWINE='/software/wine/1.7.42/linux.centos6.i386/bin/wine' 
+    PATHTOWINEAPP=/disk1/.wine-ptgui/drive_c/Program\ Files/PTGui/PTGui.exe
+}
+
+# Make sure you aren't trying to do something absurd
+if [ "$#" -gt 3 ]; then
+    echo -e "\nNo more than three arguments are accepted."
+    echo "Usage is ptgui -batch -x /jobs/path/to/ptgui_batch.pts"
+    echo -e "Exiting...\n"
+    exit 1
+fi
+
+# Do the unix to windows path translation
+# Google 'get last argument bash' for an explanation of the for loop below
+for last; do true; done
+path=$last
+newpath=${path//\//\\\\}
+finalpath="Z:$newpath"
+
+# Check if we already have the wineprefix installed
+if [ -d /disk1/.wine-ptgui ]; then
+    set_wine_environment
+    if [ "$#" -eq 3 ]; then
+        "$PATHTOWINE" "$PATHTOWINEAPP" "$1" "$2" "$finalpath" &
+    elif [ "$#" -eq 2 ]; then
+        "$PATHTOWINE" "$PATHTOWINEAPP" "$1" "$finalpath" &
+    else
+        "$PATHTOWINE" "$PATHTOWINEAPP" &
+    fi
+    sleep 5
+    exit 0
+else
+    copy_wineprefix
+    copy_config
+    set_wine_environment
+    if [ "$#" -eq 3 ]; then
+        "$PATHTOWINE" "$PATHTOWINEAPP" "$1" "$2" "$finalpath" &
+    elif [ "$#" -eq 2 ]; then
+        "$PATHTOWINE" "$PATHTOWINEAPP" "$1" "$finalpath" &
+    else
+        "$PATHTOWINE" "$PATHTOWINEAPP" &
+    fi
+    sleep 5
+    exit 0
+fi
+
+
